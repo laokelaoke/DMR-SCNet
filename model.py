@@ -294,9 +294,13 @@ class scnet(nn.Module):
         self.adjust_conv = nn.Conv2d(32,3,kernel_size=3,stride=1,padding=1)
     def forward(self, x):
         out1 = self.step1(x)
-        out = self.step2(out1)
-        out = self.step3(out)
+        out2 = self.step2(out1)
+        out_rgb = torch.Sigmoid(out2)
+        out3 = self.step3(out2)
         out = self.adjust_conv(out)
+        hsv_feature = out[:, :3, :, :]
+        rgb_feature = out[:, 3:, :, :]
+        out = hsv_feature * out1 + rgb_feature * out_rgb
         return out
 
 
